@@ -3,68 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Todo App</title>
+    <title>Login</title>
+    <link rel="stylesheet" href="./styles/index.css" />
   </head>
   <body>
-    <h1>Todo App</h1>
-    <input type="text" id="todoInput" placeholder="Enter a new todo" />
-    <button id="addButton">Add</button>
-    <ul id="todoList"></ul>
+    <div class="login-parent">
+      <div class="login-child">
+        <img src="/public/assets/logo.png" alt="logo" width="250px" />
+        <div>Sign in to your account</div>
+        <form id="myForm">
+          <div>
+            <label for="userId">Username</label>
+          </div>
+          <div>
+            <input
+              type="text"
+              id="userId"
+              name="username"
+              placeholder="Write text.."
+              required="true"
+            />
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
   </body>
-
   <script>
-    // Get references to HTML elements
-    const todoInput = document.getElementById("todoInput");
-    const addButton = document.getElementById("addButton");
-    const todoList = document.getElementById("todoList");
+    document.addEventListener("DOMContentLoaded", function () {
+      // Load savedData from local storage
+      let savedData = JSON.parse(localStorage.getItem("appData")) || [];
 
-    // Load todos from local storage
-    let todos = JSON.parse(localStorage.getItem("todos")) || [];
+      const form = document.getElementById("myForm");
 
-    //Function to render todos
-    function renderTodos() {
-      todoList.innerHTML = "";
-      todos.forEach((todo, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-        ${todo}
-        <button class = "editButton" data-index="${index}">Edit</button>
-        <button class = "deleteButton" data-index= "${index}">Delete</button>
-        `;
-        todoList.appendChild(li);
-      });
-    }
+      form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent form submission
 
-    // Initial rendering
-    renderTodos();
+        // Get form data
+        const username = document.getElementById("userId").value;
 
-    // Add todo
-    addButton.addEventListener("click", () => {
-      const newTodo = todoInput.value.trim();
-      if (newTodo !== "") {
-        todos.push(newTodo);
-        localStorage.setItem("todos", JSON.stringify(todos));
-        renderTodos();
-        todoInput.value = "";
-      }
-    });
+        // Create an object to store the data
+        const formData = {
+          username: username,
+          homeworks: [],
+        };
 
-    // Edit and Delete todo
-    todoList.addEventListener("click", (event) => {
-      if (event.target.classList.contains("editButton")) {
-        const index = parseInt(event.target.getAttribute("data-index"));
-        const updatedTodo = prompt("Edit todo:", todos[index]);
-        if (updatedTodo !== null) {
-          todos[index] = updatedTodo;
-          localStorage.setItem("todos", JSON.stringify(todos));
-          renderTodos();
+        // Checks if user already exists or not
+        const userExist = savedData.filter((item) => {
+          return formData.username === item.username;
+        });
+
+        if (!userExist.length) {
+          savedData.push(formData);
         }
-      } else if (event.target.classList.contains("deleteButton")) {
-        const index = parseInt(event.target.getAttribute("data-index"));
-        todos.splice(index, 1);
-        localStorage.setItem("todos", JSON.stringify(todos));
-        renderTodos();
-      }
+
+        // Convert the object to a JSON string
+        const formDataJSON = JSON.stringify(savedData);
+
+        // Store the JSON string in local storage
+        localStorage.setItem("appData", formDataJSON);
+        localStorage.setItem("loginData", username);
+
+        // Redirect to another page
+        window.location.href = `homework-tracker.html`;
+      });
     });
   </script>
 </html>

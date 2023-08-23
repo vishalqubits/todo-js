@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homework Tracker</title>
+  </head>
+  <body>
+    <div id="userName"></div>
+    <h1>Homework Tracker</h1>
+    <input type="text" id="todoInput" placeholder="Enter a new todo" />
+    <button id="addButton">Add</button>
+    <ul id="todoList"></ul>
+  </body>
+
+  <script>
+    // Read data from local storage
+    let username = localStorage.getItem("loginData") || "";
+    document.getElementById("userName").innerHTML = username;
+
+    // Get references to HTML elements
+    const todoInput = document.getElementById("todoInput");
+    const addButton = document.getElementById("addButton");
+    const todoList = document.getElementById("todoList");
+
+    // Load todos from local storage
+    let todos = JSON.parse(localStorage.getItem("todos")) || [];
+
+    //Function to render todos
+    function renderTodos() {
+      todoList.innerHTML = "";
+      todos.forEach((todo, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+        ${todo}
+        <button class = "editButton" data-index="${index}">Edit</button>
+        <button class = "deleteButton" data-index= "${index}">Delete</button>
+        `;
+        todoList.appendChild(li);
+      });
+    }
+
+    // Initial rendering
+    renderTodos();
+
+    // Add todo
+    addButton.addEventListener("click", () => {
+      const newTodo = todoInput.value.trim();
+      if (newTodo !== "") {
+        todos.push(newTodo);
+        localStorage.setItem("todos", JSON.stringify(todos));
+        renderTodos();
+        todoInput.value = "";
+      }
+    });
+
+    // Edit and Delete todo
+    todoList.addEventListener("click", (event) => {
+      if (event.target.classList.contains("editButton")) {
+        const index = parseInt(event.target.getAttribute("data-index"));
+        const updatedTodo = prompt("Edit todo:", todos[index]);
+        if (updatedTodo !== null) {
+          todos[index] = updatedTodo;
+          localStorage.setItem("todos", JSON.stringify(todos));
+          renderTodos();
+        }
+      } else if (event.target.classList.contains("deleteButton")) {
+        const index = parseInt(event.target.getAttribute("data-index"));
+        todos.splice(index, 1);
+        localStorage.setItem("todos", JSON.stringify(todos));
+        renderTodos();
+      }
+    });
+  </script>
+</html>
